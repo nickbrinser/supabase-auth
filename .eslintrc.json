@@ -20,6 +20,8 @@
     "project": ["./tsconfig.json"],
     "sourceType": "module",
     "ecmaFeatures": { "jsx": true },
+    // Fixes some issues with some of the type-based checks in @typescript-eslint
+    // See wall of text here: https://github.com/typescript-eslint/typescript-eslint/issues/2094
     "EXPERIMENTAL_useSourceOfProjectReferenceRedirect": true
   },
   "plugins": [
@@ -41,12 +43,13 @@
     "@typescript-eslint/ban-types": [
       "error",
       {
-        "extendDefaults": false,
+        "extendDefaults": false, // Don't rely on the defaults, let's customize it ourselves
         "types": {
           "Object": {
             "message": "Avoid using the `Object` type. Prefer a generic type parameter if you can, or use `object` or `{}` if you have to use a raw object type.",
             "fixWith": "object"
           },
+          // Disable the rule for `object` and `{}` as there are enough legit use cases of this that we don't want to punish people too hard for using them
           "object": false,
           "{}": false,
           "Function": {
@@ -117,6 +120,7 @@
       }
     ],
     "@typescript-eslint/no-unused-vars": [
+      /* TODO: make this a warning for now - we'll come back an fix/errorify this separately, then make it an error */
       "error",
       {
         "varsIgnorePattern": "^_.*",

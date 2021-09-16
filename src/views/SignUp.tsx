@@ -1,6 +1,8 @@
 import { useState } from 'react'
 import { Link } from 'react-router-dom'
 
+import { signUp } from '../Auth'
+
 export function SignUp() {
   const [email, setEmail] = useState<string>('')
   const [password, setPassword] = useState<string>('')
@@ -32,7 +34,7 @@ export function SignUp() {
           <button
             onClick={e => {
               e.preventDefault()
-              // @TODO: add signup func from supabase auth
+              signUp(email, password)
             }}
             className={'button block'}
           >

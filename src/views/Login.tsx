@@ -1,6 +1,8 @@
 import { useState } from 'react'
 import { Link } from 'react-router-dom'
 
+import { login } from '../Auth'
+
 export function Login() {
   const [email, setEmail] = useState<string>('')
   const [password, setPassword] = useState<string>('')
@@ -8,7 +10,7 @@ export function Login() {
   return (
     <div className="row flex flex-center">
       <div className="col-6 form-widget">
-        <h1 className="header">Supabase + React</h1>
+        <h1 className="header">Login </h1>
 
         <div>
           <input
@@ -32,7 +34,7 @@ export function Login() {
           <button
             onClick={e => {
               e.preventDefault()
-              // @TODO: add login func from supabase auth
+              login(email, password)
             }}
             className={'button block'}
           >
@@ -43,8 +45,8 @@ export function Login() {
           className="row flex flex-center items-center "
           style={{ gap: '8px' }}
         >
-          <p>Already have an account? </p>
-          <Link to="/signup">Log In</Link>
+          <p>Need to make an account?</p>
+          <Link to="/signup">Sign Up</Link>
         </div>
       </div>
     </div>

@@ -1,24 +1,24 @@
 import React from 'react'
 import * as RD from '@devexperts/remote-data-ts'
 import { User } from '@supabase/gotrue-js'
-import { flow, pipe } from 'fp-ts/lib/function'
+import { pipe } from 'fp-ts/lib/function'
 import * as O from 'fp-ts/Option'
 
-import { supabase } from './supabaseClient'
+import { supabase } from './supabase'
 
 // ---------- authentication actions -------------
 
 export const signUp = (email: string, password: string) =>
   supabase.auth.signUp({ email, password })
 
-export const signIn = (email: string, password: string) =>
+export const login = (email: string, password: string) =>
   supabase.auth.signIn({ email, password })
 
 export const signOut = () => supabase.auth.signOut()
 
 // ----------- React authentication functionality --------
 
-export type CurrentUser = RD.RemoteData<Error, User> // NOTE: this could potentially be O.Option<User>
+export type CurrentUser = RD.RemoteData<Error, O.Option<User>> // NOTE: this could potentially be O.Option<User>
 export const AuthContext = React.createContext<CurrentUser>(RD.initial)
 
 interface AuthProviderProps {
@@ -26,19 +26,18 @@ interface AuthProviderProps {
 }
 
 export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
-  const [user, setUser] = React.useState<CurrentUser>(RD.pending)
-
+  const [currentUser, setCurrentUser] = React.useState<CurrentUser>(RD.pending)
   React.useEffect(() => {
-    supabase.auth.onAuthStateChange((_, session) =>
-      pipe(
-        session,
-        O.fromNullable,
-        O.chain(s => pipe(s.user, O.fromNullable)),
-        O.map(flow(RD.success, setUser)),
-      ),
+    const user = pipe(
+      supabase.auth.session(),
+      O.fromNullable,
+      O.chain(s => pipe(s.user, O.fromNullable)),
     )
-  })
-  return <AuthContext.Provider value={user}>{children}</AuthContext.Provider>
+    setCurrentUser(RD.success(user))
+  }, [])
+  return (
+    <AuthContext.Provider value={currentUser}>{children}</AuthContext.Provider>
+  )
 }
 
 export const useAuth = () => {

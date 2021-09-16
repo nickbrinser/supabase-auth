@@ -1,21 +1,36 @@
-import { BrowserRouter as Router, Route, Switch } from 'react-router-dom'
+import { lazy, Suspense } from 'react'
+import * as RD from '@devexperts/remote-data-ts'
+import { pipe } from 'fp-ts/lib/function'
+import * as O from 'fp-ts/Option'
 
 import './index.css'
 
-import { Home } from './views/Home'
-import { Login } from './views/Login'
-import { SignUp } from './views/SignUp'
+import { useAuth } from './Auth'
+
+const AuthenticatedApp = lazy(() => import('./authenticatedApp'))
+const UnauthenticatedApp = lazy(() => import('./unauthenticatedApp'))
 
 export function App() {
+  const currentUser = useAuth()
+  console.log(currentUser)
   return (
-    <div className="container">
-      <Router>
-        <Switch>
-          <Route exact path="/" component={Home} />
-          <Route path="/signup" component={SignUp} />
-          <Route path="/login" component={Login} />
-        </Switch>
-      </Router>
-    </div>
+    <Suspense fallback={<div />}>
+      {pipe(
+        currentUser,
+        RD.fold(
+          () => null,
+          () => <p>Loading</p>,
+          () => <p>There is an error with authentication.</p>,
+          user =>
+            pipe(
+              user,
+              O.fold(
+                () => <UnauthenticatedApp />,
+                () => <AuthenticatedApp />,
+              ),
+            ),
+        ),
+      )}
+    </Suspense>
   )
 }

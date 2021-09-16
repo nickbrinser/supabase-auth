@@ -3,7 +3,7 @@
   "version": "0.1.0",
   "private": true,
   "dependencies": {
-    "@devexperts/remote-data-ts": "^2.0.5",
+    "@devexperts/remote-data-ts": "^2.1.1",
     "@supabase/supabase-js": "^1.22.5",
     "@testing-library/jest-dom": "^5.11.4",
     "@testing-library/react": "^11.1.0",
@@ -13,6 +13,8 @@
     "@types/react": "^17.0.0",
     "@types/react-dom": "^17.0.0",
     "fp-ts": "^2.11.1",
+    "io-ts": "^2.2.16",
+    "io-ts-types": "^0.5.16",
     "react": "^17.0.2",
     "react-dom": "^17.0.2",
     "react-router-dom": "^5.3.0",
@@ -25,12 +27,6 @@
     "build": "react-scripts build",
     "test": "react-scripts test",
     "eject": "react-scripts eject"
-  },
-  "eslintConfig": {
-    "extends": [
-      "react-app",
-      "react-app/jest"
-    ]
   },
   "browserslist": {
     "production": [
@@ -48,6 +44,11 @@
     "@types/react-router-dom": "^5.1.8",
     "@typescript-eslint/parser": "^4.31.0",
     "eslint": "^7.32.0",
+    "eslint-config-standard": "^16.0.3",
+    "eslint-plugin-import": "^2.24.2",
+    "eslint-plugin-node": "^11.1.0",
+    "eslint-plugin-promise": "^5.1.0",
+    "eslint-plugin-react": "^7.25.1",
     "eslint-plugin-simple-import-sort": "^7.0.0"
   }
 }
