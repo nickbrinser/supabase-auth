@@ -1,6 +1,6 @@
 import React from 'react'
 import * as RD from '@devexperts/remote-data-ts'
-import { User } from '@supabase/gotrue-js'
+import { Session, User } from '@supabase/gotrue-js'
 import { pipe } from 'fp-ts/lib/function'
 import * as O from 'fp-ts/Option'
 
@@ -28,12 +28,15 @@ interface AuthProviderProps {
 export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
   const [currentUser, setCurrentUser] = React.useState<CurrentUser>(RD.pending)
   React.useEffect(() => {
-    const user = pipe(
-      supabase.auth.session(),
-      O.fromNullable,
-      O.chain(s => pipe(s.user, O.fromNullable)),
-    )
+    const user = getUserFromSession(supabase.auth.session())
     setCurrentUser(RD.success(user))
+
+    const { data: listener } = supabase.auth.onAuthStateChange((_, session) =>
+      pipe(session, getUserFromSession, RD.success, setCurrentUser),
+    )
+    return () => {
+      listener?.unsubscribe()
+    }
   }, [])
   return (
     <AuthContext.Provider value={currentUser}>{children}</AuthContext.Provider>
@@ -47,3 +50,10 @@ export const useAuth = () => {
   }
   return context
 }
+
+export const getUserFromSession = (session: Session | null) =>
+  pipe(
+    session,
+    O.fromNullable,
+    O.chain(s => pipe(s.user, O.fromNullable)),
+  )
