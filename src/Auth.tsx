@@ -38,6 +38,7 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
       listener?.unsubscribe()
     }
   }, [])
+
   return (
     <AuthContext.Provider value={currentUser}>{children}</AuthContext.Provider>
   )

@@ -1,11 +1,40 @@
 import { useState } from 'react'
-import { Link } from 'react-router-dom'
+import { Link, useHistory } from 'react-router-dom'
+// import axios from 'axios'
+// import * as E from 'fp-ts/Either'
+import { pipe } from 'fp-ts/lib/function'
+import * as O from 'fp-ts/Option'
+import * as T from 'fp-ts/Task'
+import * as TE from 'fp-ts/TaskEither'
 
 import { login } from '../Auth'
 
 export function Login() {
   const [email, setEmail] = useState<string>('')
   const [password, setPassword] = useState<string>('')
+
+  const history = useHistory()
+  // console.log(history)
+
+  const handleLogin = pipe(
+    TE.tryCatch(
+      () => login(email, password),
+      reason => new Error(`${reason}`), // NOTE: with the Supabase Api, this case will never since the error is mapped to response param and not rejected.
+    ),
+    TE.foldW(
+      _err => T.fromIO(() => alert(_err)),
+      ({ error }) =>
+        pipe(
+          error,
+          O.fromNullable,
+          // NOTE: There must be a way to use TE.chain to map this error to another TaskEither and just use a single fold.
+          O.fold(
+            () => T.of(history.push('/')),
+            err => T.fromIO(() => alert(err)),
+          ),
+        ),
+    ),
+  )
 
   return (
     <div className="row flex flex-center">
@@ -34,7 +63,7 @@ export function Login() {
           <button
             onClick={e => {
               e.preventDefault()
-              login(email, password)
+              handleLogin()
             }}
             className={'button block'}
           >
