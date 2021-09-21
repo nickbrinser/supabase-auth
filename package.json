@@ -12,7 +12,6 @@
     "@types/node": "^16.7.11",
     "@types/react": "^17.0.0",
     "@types/react-dom": "^17.0.0",
-    "axios": "^0.21.4",
     "fp-ts": "^2.11.1",
     "io-ts": "^2.2.16",
     "io-ts-types": "^0.5.16",
