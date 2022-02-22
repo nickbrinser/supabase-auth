@@ -1,8 +1,9 @@
 import { useState } from 'react'
 import { Link, useHistory } from 'react-router-dom'
+import * as E from 'fp-ts/Either'
 import { pipe } from 'fp-ts/lib/function'
 import * as T from 'fp-ts/Task'
-import * as TO from 'fp-ts/TaskOption'
+import * as TE from 'fp-ts/TaskEither'
 
 import { login } from '../Auth'
 
@@ -13,11 +14,11 @@ export function Login() {
   const history = useHistory()
 
   const handleLogin = pipe(
-    TO.tryCatch(() => login(email, password)),
-    TO.chain(({ error }) => pipe(error, TO.fromNullable)), // NOTE: supbase catches errors in their API client, so we need to extract any errors from the response
-    TO.fold(
-      () => T.of(history.push('/')),
+    () => login(email, password),
+    T.map(res => (res.error ? E.left(res.error) : E.right(res))),
+    TE.fold(
       err => T.fromIO(() => alert(err.message)),
+      () => T.of(history.push('/')),
     ),
   )
 
